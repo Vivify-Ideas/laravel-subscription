@@ -1,4 +1,4 @@
-# Subscription Billing for Laravel 5
+# Subscription Billing for Laravel 5 (only 2Checkout)
 
 [![Build Status](https://travis-ci.org/navneetrai/laravel-subscription.svg)](https://travis-ci.org/navneetrai/laravel-subscription)
 [![Coverage Status](https://coveralls.io/repos/navneetrai/laravel-subscription/badge.svg)](https://coveralls.io/r/navneetrai/laravel-subscription)
@@ -12,7 +12,7 @@ laravel-subscription is a simple laravel 5 library for creating subscription bil
 If you want to handle non-recurring payments, you can use [Omnipay](http://omnipay.thephpleague.com/) for one-time payments and token billing.
 
 ---
- 
+
 - [Supported services](#supported-services)
 - [Installation](#installation)
 - [Registering the Package](#registering-the-package)
@@ -21,15 +21,7 @@ If you want to handle non-recurring payments, you can use [Omnipay](http://omnip
 
 ## Supported services
 
-The library supports [Paypal](https://www.paypal.com) and credit card processors [2Checkout](https://www.2checkout.com/) and [CCNow](http://www.ccnow.com/). More services will be implemented soon.
-
-Included service implementations:
-
- - Paypal
- - 2Checkout
- - CCNow
-- more to come!
-
+The library supports [2Checkout](https://www.2checkout.com/)
 
 ## Installation
 
@@ -54,7 +46,7 @@ Register the service provider within the ```providers``` array found in ```confi
 ```php
 'providers' => [
   // ...
-  
+
   Userdesk\Subscription\SubscriptionServiceProvider::class,
 ]
 ```
@@ -65,7 +57,7 @@ Add an alias within the ```aliases``` array found in ```config/app.php```:
 ```php
 'aliases' => [
   // ...
-  
+
   'Subscription'     => Userdesk\Subscription\Facades\Subscription::class,
 ]
 ```
@@ -88,8 +80,8 @@ Create configuration file manually in config directory ``config/subscription.php
 
 ```php
 <?php
-return [ 
-  
+return [
+
   /*
   |--------------------------------------------------------------------------
   | Subscription Config
@@ -109,7 +101,7 @@ return [
   */
   'services' => [
     'paypal'=>[
-      'email'=>'', 
+      'email'=>'',
       'logo'=>'',
       'auth'=>''
     ],
@@ -169,7 +161,7 @@ A basic implementation of ``SubscriptionProductContract`` and ``SubscriptionCons
 
 #### Handling Processor Notifications
 
-You can handle Processor Notifications and Processor Cart Return Data by forwarding them to ``ipn`` and ``pdt`` functions respectively. 
+You can handle Processor Notifications and Processor Cart Return Data by forwarding them to ``ipn`` and ``pdt`` functions respectively.
 
 Both these function excpects only one input with request data as array and returns ``TransactionResult`` object.
 
@@ -179,18 +171,18 @@ public function cartComplete(Request $request, $proc){
 	try{
 		$result = $processor->pdt($request->all());
 	}catch(TransactionException $exception){
-		Log::error($exception->getMessage());	
+		Log::error($exception->getMessage());
 	}
-	
+
 	if(!empty($result)){
 		$cartId = $result->getId();
 	  	if(!empty($cartId)){
-	  		$action = $result->getAction();    
+	  		$action = $result->getAction();
 			if($action=='signup'){
 				//Handle successful Signup
 			}
 		}else{
-			Log::error('Cart Not Found For PDT', ['proc'=>$proc, 'data'=>$request->all()]);	
+			Log::error('Cart Not Found For PDT', ['proc'=>$proc, 'data'=>$request->all()]);
 		}
 	}
 }
@@ -203,21 +195,21 @@ public function handleIpn(Request $request, $proc){
 	  	$result = $processor->ipn($request->all());
 	}catch(Userdesk\Subscription\Exceptions\TransactionException $exception){
 	  	//Handle Exceptions
-	  	Log::error($exception->getMessage());  
+	  	Log::error($exception->getMessage());
 	}
 
 	if(!empty($result)){
 	  	$cartId = $result->getId();
 	  	if(!empty($cartId)){
-		    $action = $result->getAction();        
+		    $action = $result->getAction();
 
 		    if($action=='signup'){
 		      //Handle Signup Code
-		    }else if($action=='payment'){          
+		    }else if($action=='payment'){
 		      $transactionId = $result->getIdent();
 		      $amount = $result->getAmount();
 		      //Handle successful payments
-		    }else if($action=='refund'){          
+		    }else if($action=='refund'){
 		      $transactionId = $result->getIdent();
 		      $amount = $result->getAmount();
 		      //Handle refunds
@@ -225,8 +217,8 @@ public function handleIpn(Request $request, $proc){
 		      //Handle cancellations;
 		    }
 		}else{
-		    Log::error('Cart Not Found For IPN', ['proc'=>$proc, 'data'=>$request->all()]); 
+		    Log::error('Cart Not Found For IPN', ['proc'=>$proc, 'data'=>$request->all()]);
 		}
-	}   
+	}
 }
 ```

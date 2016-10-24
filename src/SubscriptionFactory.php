@@ -1,17 +1,20 @@
-<?php namespace Userdesk\Subscription;
+<?php
+
+namespace Userdesk\Subscription;
+
 use Userdesk\Subscription\Exceptions\SubscriptionException;
+use Userdesk\Subscription\Services\Common\RestClient;
 use Config;
 
 class SubscriptionFactory{
 
-	/**
+    /**
      * @var array
      */
     protected $serviceClassMap = array();
 
     public function __construct(){
         $this->registerServiceAlias('TwoCheckout', '2checkout');
-        $this->registerServiceAlias('CCNow', 'ccnow');
     }
 
     /**
@@ -37,20 +40,20 @@ class SubscriptionFactory{
      *
      * @return \Userdesk\Subscription\Contracts\Service
      */
-	public function createService($serviceName){        
+    public function createService($serviceName){
         $config = Config::get(sprintf("subscription.services.%s", $serviceName));
 
         if(empty($config)){
             throw new SubscriptionException(sprintf('No Config exists for Service %s.', $serviceName));
         }
 
-		$fullyQualifiedServiceName = $this->getFullyQualifiedServiceName($serviceName);
+        $fullyQualifiedServiceName = $this->getFullyQualifiedServiceName($serviceName);
         if (class_exists($fullyQualifiedServiceName)) {
             return $this->buildService($fullyQualifiedServiceName, $config);
         }
 
         return null;
-	}
+    }
 
     /**
      * Register a custom service to classname mapping.
@@ -67,16 +70,16 @@ class SubscriptionFactory{
             throw new SubscriptionException(sprintf('Service class %s does not exist.', $className));
         }
         $reflClass = new \ReflectionClass($className);
-        
+
         if ($reflClass->implementsInterface('Userdesk\\Subscription\\Contracts\\Service')) {
             $this->serviceClassMap[ucfirst($serviceName)] = $className;
             return $this;
         }
-        
+
         throw new SubscriptionException(sprintf('Service class %s must implement ServiceInterface.', $className));
     }
 
-	/**
+    /**
      * Gets the fully qualified name of the service
      *
      * @param string $serviceName The name of the service of which to get the fully qualified name
@@ -99,6 +102,8 @@ class SubscriptionFactory{
      * @return PaymentInterface
      */
     private function buildService($serviceName, $config) {
-        return new $serviceName($config);
+        $restClient = new RestClient($config['base_url']);
+
+        return new $serviceName($config, $restClient);
     }
 }

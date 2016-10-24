@@ -1,7 +1,7 @@
 {
     "name": "navneetrai/laravel-subscription",
     "type": "library",
-    "description": "Subscription Billing manager for Laravel 5.2",
+    "description": "Modified Subscription Billing manager for Laravel 5.3 (Only 2Checkout)",
     "keywords": ["laravel", "subscription", "billing", "paypal", "2checkout"],
     "homepage":"https://github.com/navneetrai/laravel-subscription",
     "license": "MIT",
@@ -9,10 +9,18 @@
         {
             "name": "Navneet Rai",
             "email": "navneetrai@gmail.com"
+        },
+        {
+            "name": "Nikola Spalevic",
+            "email": "nikola.s@vivifyideas.com"
         }
     ],
     "require": {
-        "php": ">=7.0"
+        "php" : "^5.5|^7.0",
+        "guzzlehttp/psr7": "~1.2",
+        "php-http/httplug": "^1.0",
+        "php-http/curl-client": "^1.4",
+        "php-http/message": "^1.2"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",
