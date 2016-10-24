@@ -23,7 +23,7 @@ interface Service{
      * @return \Illuminate\Http\Response|null
      */
     public function completeWithoutRedirection(
-        int $id, SubscriptionConsumerContract $consumer, float $total = 0, $token = null
+        int $id, Consumer $consumer, float $total = 0, $token = null
     );
 
     /**

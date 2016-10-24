@@ -44,7 +44,7 @@ class RestClient {
      */
     public function post($endpointUri, $data = [])
     {
-        return $this->send('POST', $endpointUri, http_build_query($data));
+        return $this->send('POST', $endpointUri, json_encode($data, true));
     }
 
     /**
@@ -56,7 +56,7 @@ class RestClient {
      */
     public function put($endpointUri, $putData = [])
     {
-        return $this->send('PUT', $endpointUri, http_build_query($putData));
+        return $this->send('PUT', $endpointUri, json_encode($data, true));
     }
 
     /**

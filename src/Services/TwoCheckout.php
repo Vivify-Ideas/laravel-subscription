@@ -14,7 +14,7 @@ use Userdesk\Subscription\Services\Common\RestClient;
 
 class TwoCheckout implements ProcessorContract{
 
-    private RestClient $restClient;
+    private $restClient;
     private $config = [];
 
     public function __construct(array $config, RestClient $restClient){
@@ -86,18 +86,16 @@ class TwoCheckout implements ProcessorContract{
 
         $sid = array_get($this->config, 'sid');
         $params = [
-            'mode' => '2CO',
             'sellerId'=> $sid,
-            'privateKey' => array_get($this->config, 'private'),
-            'merchant_order_id' => $id,
+            'privateKey' => array_get($this->config, 'secret'),
+            'merchantOrderId' => $id,
             'token' => $token,
             'currency' => array_get($this->config, 'currency'),
-            'total' => $product->getPrice(),
+            'total' => $total,
 
             'billingAddr' => [
                 'name' => $consumer->getName(),
                 'addrLine1' => $consumer->getAddress(),
-                'addrLine2' => '',
                 'city' => $consumer->getCity(),
                 'state' => $consumer->getState(),
                 'zipCode' => $consumer->getZip(),
@@ -106,7 +104,7 @@ class TwoCheckout implements ProcessorContract{
             ]
         ];
 
-        return $this->send('POST', '1/' . $sid . '/rs/authService', $params);
+        return $this->restClient->post('1/' . $sid . '/rs/authService', $params);
     }
 
     /**

@@ -15,10 +15,10 @@ return [
     */
     'services' => [
 
-        '2checkout' => [
+        'TwoCheckout' => [
             'sid' => '',
             'secret' => '',
-            'private' => '',
+            'publishable_key' => '',
             'currency' => 'USD',
             'base_url' => 'https://www.2checkout.com/checkout/api/'
         ]

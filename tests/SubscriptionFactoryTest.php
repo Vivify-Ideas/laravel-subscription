@@ -9,15 +9,15 @@ use Userdesk\Subscription\SubscriptionFactory;
 use Config;
 
 class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
-{   
+{
 
     /**
      * @covers Userdesk\Subscription\SubscriptionFactory::createService
      */
     public function testCreateServiceThrowsExceptionIfNoConfig(){
-    	$this->setExpectedException('\\Userdesk\Subscription\Exceptions\SubscriptionException');
-		$factory = new SubscriptionFactory();
-        $service = $factory->createService('paypal');
+        $this->setExpectedException('\\Userdesk\Subscription\Exceptions\SubscriptionException');
+        $factory = new SubscriptionFactory();
+        $service = $factory->createService('TwoCheckout');
     }
 
     /**
@@ -26,7 +26,7 @@ class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
      * @covers Userdesk\Subscription\SubscriptionFactory::buildService
      */
     public function testCreateServiceNonExistentService() {
-    	Config::set('subscription.services.foo.email', 'test@best.com');
+        Config::set('subscription.services.foo.email', 'test@best.com');
 
         $factory = new SubscriptionFactory();
         $service = $factory->createService('foo');
@@ -40,20 +40,18 @@ class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
      * @covers Userdesk\Subscription\SubscriptionFactory::buildService
      */
     public function testCreateServicePreLoaded(){
-    	Config::set('subscription.services.paypal.email', 'test@best.com');
+        $factory = new SubscriptionFactory();
+        $service = $factory->createService('TwoCheckout');
 
-		$factory = new SubscriptionFactory();
-        $service = $factory->createService('paypal');
-
-        $this->assertInstanceOf('Userdesk\\Subscription\\Services\\Paypal', $service);
+        $this->assertInstanceOf('Userdesk\\Subscription\\Services\\TwoCheckout', $service);
     }
-	
-	/**
+
+    /**
      * @covers Userdesk\Subscription\SubscriptionFactory::registerService
      */
     public function testRegisterServiceThrowsExceptionIfNonExistentClass(){
-    	$this->setExpectedException('\\Userdesk\Subscription\Exceptions\SubscriptionException');
-		$factory = new SubscriptionFactory();
+        $this->setExpectedException('\\Userdesk\Subscription\Exceptions\SubscriptionException');
+        $factory = new SubscriptionFactory();
         $factory->registerService('foo', 'bar');
     }
 
@@ -61,8 +59,8 @@ class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
      * @covers Userdesk\Subscription\SubscriptionFactory::registerService
      */
     public function testRegisterServiceThrowsExceptionIfClassNotFulfillsContract(){
-    	$this->setExpectedException('\\Userdesk\Subscription\Exceptions\SubscriptionException');
-		$factory = new SubscriptionFactory();
+        $this->setExpectedException('\\Userdesk\Subscription\Exceptions\SubscriptionException');
+        $factory = new SubscriptionFactory();
         $factory->registerService('foo', 'Userdesk\\Subscription\\SubscriptionFactory');
     }
 
@@ -70,31 +68,31 @@ class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
      * @covers Userdesk\Subscription\SubscriptionFactory::registerService
      */
     public function testRegisterServiceSuccessIfClassFulfillsContract(){
-		$factory = new SubscriptionFactory();
+        $factory = new SubscriptionFactory();
         $this->assertInstanceOf(
             'Userdesk\\Subscription\\SubscriptionFactory',
             $factory->registerService('foo', 'Userdesk\\Subscription\\Mocks\\MockService')
         );
     }
 
-	/**
+    /**
      * @covers Userdesk\Subscription\SubscriptionFactory::registerServiceAlias
      * @covers Userdesk\Subscription\SubscriptionFactory::registerService
      */
     public function testRegisterServiceAlias(){
-    	Config::set('subscription.services.paypal.email', 'test@best.com');
-    	Config::set('subscription.services.alias.email', 'test@best.com');
+        Config::set('subscription.services.paypal.email', 'test@best.com');
+        Config::set('subscription.services.alias.email', 'test@best.com');
 
         $factory = new SubscriptionFactory();
         $service = $factory->createService('alias');
 
         $this->assertNull($service);
 
-        $factory->registerServiceAlias('paypal', 'alias');
+        $factory->registerServiceAlias('TwoCheckout', 'alias');
 
         $newService = $factory->createService('alias');
 
-        $this->assertInstanceOf('Userdesk\\Subscription\\Services\\Paypal', $newService);
+        $this->assertInstanceOf('Userdesk\\Subscription\\Services\\TwoCheckout', $newService);
     }
 
     /**
@@ -104,7 +102,7 @@ class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
      * @covers Userdesk\Subscription\SubscriptionFactory::buildService
      */
     public function testCreateServiceUserRegistered(){
-    	Config::set('subscription.services.foo.email', 'test@best.com');
+        Config::set('subscription.services.foo.email', 'test@best.com');
 
         $factory = new SubscriptionFactory();
         $service = $factory->createService('foo');
@@ -125,7 +123,7 @@ class SubscriptionFactoryTest extends \Orchestra\Testbench\TestCase
      * @covers Userdesk\Subscription\SubscriptionFactory::buildService
      */
     public function testCreateServiceUserRegisteredOverridesPreLoaded(){
-    	Config::set('subscription.services.paypal.email', 'test@best.com');
+        Config::set('subscription.services.paypal.email', 'test@best.com');
 
         $factory = new SubscriptionFactory();
         $factory->registerService('paypal', 'Userdesk\Subscription\Mocks\MockService');

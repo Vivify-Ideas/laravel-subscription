@@ -36,13 +36,11 @@ class SubscriptionTest extends \Orchestra\Testbench\TestCase
      */
     public function testCreateProcessor()
     {
-        Config::set('subscription.services.paypal.email', 'test@best.com');
-
         $subscriptionFactory = Mockery::mock('Userdesk\Subscription\SubscriptionFactory[createService]');
         $subscriptionFactory->shouldReceive('createService')->passthru();
 
         $subscription = new Subscription($subscriptionFactory);
-        $processor = $subscription->processor('paypal');
-        $this->assertInstanceOf('Userdesk\Subscription\Services\Paypal', $processor);
+        $processor = $subscription->processor('TwoCheckout');
+        $this->assertInstanceOf('Userdesk\Subscription\Services\TwoCheckout', $processor);
     }
 }
